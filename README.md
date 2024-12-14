@@ -13,7 +13,7 @@ O objetivo principal deste projeto é criar uma aplicação intuitiva e eficaz q
 
 # Tecnologias
 # Front-end
-Python
+•	Python
 # Back-end
 •	Python
 
