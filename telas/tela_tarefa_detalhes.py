@@ -3,7 +3,7 @@ from data.database import excluir_tarefa, atualizar_tarefa
 from datetime import datetime
 
 def tela_tarefa_detalhes(page: ft.Page, tarefa, usuario_id: int):
-    tarefa_id, titulo, descricao, prazo, prioridade, categoria = tarefa
+    tarefa_id, titulo, descricao, prazo, prioridade, categoria, _ = tarefa
 
     def excluir(e):
         excluir_tarefa(tarefa_id)
