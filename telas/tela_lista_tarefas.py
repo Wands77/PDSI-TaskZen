@@ -18,8 +18,27 @@ def tela_lista_tarefas(page: ft.Page, user_id: int):
 
     def atualizar_status(id_tarefa, novo_status):
         atualizar_status_tarefa(id_tarefa, novo_status)
-        tarefas_do_usuario = carregar_tarefas(user_id)
-        renderizar_tarefas(tarefas_do_usuario)
+
+        tarefas = carregar_tarefas(user_id)
+
+        tarefas_em_progresso = [
+            t for t in tarefas if t[6] == "Em Progresso" and datetime.strptime(t[3], "%d/%m/%Y %H:%M") >= datetime.now()
+        ]
+        tarefas_pendentes = [
+            t for t in tarefas if t[6] == "Pendente" and datetime.strptime(t[3], "%d/%m/%Y %H:%M") >= datetime.now()
+        ]
+        tarefas_vencidas = [
+            t for t in tarefas if datetime.strptime(t[3], "%d/%m/%Y %H:%M") < datetime.now() and t[6] != "Concluído"
+        ]
+        tarefas_concluidas = [t for t in tarefas if t[6] == "Concluído"]
+
+        tarefas_em_progresso.sort(key=lambda t: datetime.strptime(t[3], "%d/%m/%Y %H:%M"))
+        tarefas_pendentes.sort(key=lambda t: datetime.strptime(t[3], "%d/%m/%Y %H:%M"))
+
+        tarefas_ordenadas = tarefas_em_progresso + tarefas_pendentes + tarefas_vencidas + tarefas_concluidas
+
+        renderizar_tarefas(tarefas_ordenadas)
+
 
     def atualizar_categorias():
         tarefas = carregar_tarefas(user_id)
@@ -85,22 +104,31 @@ def tela_lista_tarefas(page: ft.Page, user_id: int):
         opcao = ordenacao_dropdown.value
         tarefas = carregar_tarefas(user_id)
 
+        tarefas_pendentes_em_progresso = [
+            t for t in tarefas if t[6] not in ["Concluído"] and datetime.strptime(t[3], "%d/%m/%Y %H:%M") >= datetime.now()
+        ]
+        tarefas_vencidas = [
+            t for t in tarefas if datetime.strptime(t[3], "%d/%m/%Y %H:%M") < datetime.now() and t[6] != "Concluído"
+        ]
+        tarefas_concluidas = [t for t in tarefas if t[6] == "Concluído"]
+
         if opcao == "Prioridade":
             prioridade_ordem = {"Alta": 0, "Média": 1, "Baixa": 2}
-            tarefas.sort(
+            tarefas_pendentes_em_progresso.sort(
                 key=lambda t: (
-                    prioridade_ordem.get(t[4], 3),
-                    datetime.strptime(t[3], "%d/%m/%Y %H:%M") if t[6] != "Concluído" else datetime.max,
+                    prioridade_ordem.get(t[4], 3), 
+                    datetime.strptime(t[3], "%d/%m/%Y %H:%M"), 
                 )
             )
         elif opcao == "Prazo":
-            tarefas.sort(
-                key=lambda t: (
-                    datetime.strptime(t[3], "%d/%m/%Y %H:%M") if t[6] != "Concluído" else datetime.max,
-                )
+            tarefas_pendentes_em_progresso.sort(
+                key=lambda t: datetime.strptime(t[3], "%d/%m/%Y %H:%M")
             )
 
-        renderizar_tarefas(tarefas)
+        tarefas_ordenadas = tarefas_pendentes_em_progresso + tarefas_vencidas + tarefas_concluidas
+
+        renderizar_tarefas(tarefas_ordenadas)
+
         page.dialog.open = False
         page.dialog = None
         page.update()
@@ -125,10 +153,6 @@ def tela_lista_tarefas(page: ft.Page, user_id: int):
             return "Data inválida"
 
     def renderizar_tarefas(tarefas):
-        # Separa tarefas vencidas das não vencidas
-        tarefas_vencidas = [t for t in tarefas if datetime.strptime(t[3], "%d/%m/%Y %H:%M") < datetime.now()]
-        tarefas_nao_vencidas = [t for t in tarefas if t not in tarefas_vencidas]
-
         tabela_tarefas.controls.clear()
 
         if not tarefas:
@@ -149,47 +173,20 @@ def tela_lista_tarefas(page: ft.Page, user_id: int):
                 )
             )
 
-            # Renderiza tarefas não vencidas
-            for tarefa in tarefas_nao_vencidas:
+            for tarefa in tarefas:
                 id, titulo, descricao, prazo, prioridade, categoria, status = tarefa
-                tempo_restante = calcular_tempo_restante(prazo)
-                status_color = "red" if status == "Pendente" else "orange" if status == "Em Progresso" else "green"
 
-                tabela_tarefas.controls.append(
-                    ft.Row(
-                        [
-                            ft.TextButton(
-                                text=titulo,
-                                on_click=lambda e, t=tarefa: abrir_tarefa(t),
-                                expand=1,
-                                style=ft.ButtonStyle(
-                                    padding=ft.Padding(5, 5, 5, 5),
-                                    shape=ft.RoundedRectangleBorder(radius=3),
-                                ),
-                            ),
-                            ft.Text(categoria, expand=1, size=12),
-                            ft.Text(tempo_restante, expand=1, size=12),
-                            ft.Text(prioridade, expand=1, size=12),
-                            ft.Dropdown(
-                                value=status,
-                                options=[
-                                    ft.dropdown.Option("Pendente", text_style=ft.TextStyle(color="red", size=10)),
-                                    ft.dropdown.Option("Em Progresso", text_style=ft.TextStyle(color="orange", size=10)),
-                                    ft.dropdown.Option("Concluído", text_style=ft.TextStyle(color="green", size=10)),
-                                ],
-                                on_change=lambda e, t_id=id: atualizar_status(t_id, e.control.value),
-                                expand=1,
-                                height=40,
-                            ),
-                        ],
-                        spacing=10,
-                        vertical_alignment=ft.CrossAxisAlignment.CENTER,
-                    )
+                prazo_exibido = (
+                    "Vencida" if datetime.strptime(prazo, "%d/%m/%Y %H:%M") < datetime.now() and status != "Concluído"
+                    else "Finalizado" if status == "Concluído"
+                    else calcular_tempo_restante(prazo)
+                )
+                prazo_cor = (
+                    "red" if prazo_exibido == "Vencida"
+                    else "green" if status == "Concluído"
+                    else "black"
                 )
 
-            # Renderiza tarefas vencidas
-            for tarefa in tarefas_vencidas:
-                id, titulo, descricao, prazo, prioridade, categoria, status = tarefa
                 tabela_tarefas.controls.append(
                     ft.Row(
                         [
@@ -203,7 +200,12 @@ def tela_lista_tarefas(page: ft.Page, user_id: int):
                                 ),
                             ),
                             ft.Text(categoria, expand=1, size=12),
-                            ft.Text("Vencida", expand=1, size=12, color="red"),
+                            ft.Text(
+                                prazo_exibido,
+                                expand=1,
+                                size=12,
+                                color=prazo_cor,
+                            ),
                             ft.Text(prioridade, expand=1, size=12),
                             ft.Dropdown(
                                 value=status,
