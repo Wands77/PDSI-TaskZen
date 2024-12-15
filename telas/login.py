@@ -58,7 +58,7 @@ def tela_login(page: ft.Page):
             [
                 logo,
                 ft.Text(
-                    "TaskZen",
+                    "TaskZen - Login",
                     size=30,
                     weight=ft.FontWeight.BOLD,
                     color=ft.colors.BLACK87,
