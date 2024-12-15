@@ -7,9 +7,11 @@ O objetivo principal deste projeto é criar uma aplicação intuitiva e eficaz q
 # Funcionalidades
 •	Criar/editar/excluir tarefas
 
-•	Visualizar lista de tarefas ordenadas pelo prazo de vencimento
+•	Visualizar lista de tarefas 
 
 •	Filtrar tarefas pela prioridade/categoria/data de vencimento
+
+•	Ordenar lista pelo prazo/prioridade
 
 # Tecnologias
 # Front-end
@@ -20,3 +22,6 @@ O objetivo principal deste projeto é criar uma aplicação intuitiva e eficaz q
 •	Python
 
 •	SQlite
+
+•	JSON
+
