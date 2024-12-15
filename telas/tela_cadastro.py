@@ -23,8 +23,9 @@ def tela_cadastro(page: ft.Page):
         nome = nome_input.value
         email = email_input.value
         senha = senha_input.value
+        confirmar_senha = confirmar_senha_input.value
 
-        if not nome or not email or not senha:
+        if not nome or not email or not senha or not confirmar_senha:
             msg_feedback.value = "Preencha todos os campos!"
             msg_feedback.color = "red"
         elif not validar_email(email):
@@ -35,6 +36,9 @@ def tela_cadastro(page: ft.Page):
             msg_feedback.color = "red"
         elif not validar_criterios_senha(senha):
             msg_feedback.value = "Senha inválida! Verifique os critérios em vermelho."
+            msg_feedback.color = "red"
+        elif senha != confirmar_senha:
+            msg_feedback.value = "As senhas não coincidem!"
             msg_feedback.color = "red"
         else:
             adicionar_usuario(nome, email, senha)
@@ -66,6 +70,12 @@ def tela_cadastro(page: ft.Page):
         can_reveal_password=True,
         on_change=lambda e: validar_criterios_senha(e.control.value),
     )
+    confirmar_senha_input = ft.TextField(
+        label="Confirmar Senha",
+        width=300,
+        password=True,
+        can_reveal_password=True,
+    )
     btn_cadastrar = ft.ElevatedButton("Cadastrar", on_click=realizar_cadastro, width=300, height=45)
     btn_voltar = ft.TextButton("Voltar para Login", on_click=voltar_login, width=300)
     msg_feedback = ft.Text("", size=14)
@@ -74,6 +84,19 @@ def tela_cadastro(page: ft.Page):
     criterio_maiuscula = ft.Text("- Pelo menos uma letra maiúscula", size=14, color="red")
     criterio_minuscula = ft.Text("- Pelo menos uma letra minúscula", size=14, color="red")
     criterio_numero = ft.Text("- Pelo menos um número", size=14, color="red")
+
+    criterios_senha = ft.Column(
+        [
+            ft.Text("A senha deve atender aos critérios:", size=14, weight=ft.FontWeight.BOLD),
+            criterio_tamanho,
+            criterio_maiuscula,
+            criterio_minuscula,
+            criterio_numero,
+        ],
+        spacing=5,  
+        alignment=ft.MainAxisAlignment.START,
+        horizontal_alignment=ft.CrossAxisAlignment.START,
+    )
 
     page.add(
         ft.Column(
@@ -89,11 +112,8 @@ def tela_cadastro(page: ft.Page):
                 nome_input,
                 email_input,
                 senha_input,
-                ft.Text("A senha deve atender aos critérios:", size=14, weight=ft.FontWeight.BOLD),
-                criterio_tamanho,
-                criterio_maiuscula,
-                criterio_minuscula,
-                criterio_numero,
+                confirmar_senha_input,
+                criterios_senha,  
                 ft.Row(
                     [
                         btn_cadastrar,  
