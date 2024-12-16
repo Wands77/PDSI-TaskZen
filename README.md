@@ -25,3 +25,9 @@ O objetivo principal deste projeto é criar uma aplicação intuitiva e eficaz q
 
 •	JSON
 
+# Autores
+wansilvaa200@gmail.com
+
+marcoschagas1111@gmail.com
+
+Victorfsalgueiros@gmail.com
