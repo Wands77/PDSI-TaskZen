@@ -22,18 +22,18 @@ def tela_lista_tarefas(page: ft.Page, user_id: int):
         tarefas = carregar_tarefas(user_id)
 
         tarefas_em_progresso = [
-            t for t in tarefas if t[6] == "Em Progresso" and datetime.strptime(t[3], "%Y-%m-%d %H:%M:%S") >= datetime.now()
+            t for t in tarefas if t[6] == "Em Progresso" and datetime.strptime(t[3], "%d/%m/%Y %H:%M") >= datetime.now()
         ]
         tarefas_pendentes = [
-            t for t in tarefas if t[6] == "Pendente" and datetime.strptime(t[3], "%Y-%m-%d %H:%M:%S") >= datetime.now()
+            t for t in tarefas if t[6] == "Pendente" and datetime.strptime(t[3], "%d/%m/%Y %H:%M") >= datetime.now()
         ]
         tarefas_vencidas = [
-            t for t in tarefas if datetime.strptime(t[3], "%Y-%m-%d %H:%M:%S") < datetime.now() and t[6] != "Concluído"
+            t for t in tarefas if datetime.strptime(t[3], "%d/%m/%Y %H:%M") < datetime.now() and t[6] != "Concluído"
         ]
         tarefas_concluidas = [t for t in tarefas if t[6] == "Concluído"]
 
-        tarefas_em_progresso.sort(key=lambda t: datetime.strptime(t[3], "%Y-%m-%d %H:%M:%S"))
-        tarefas_pendentes.sort(key=lambda t: datetime.strptime(t[3], "%Y-%m-%d %H:%M:%S"))
+        tarefas_em_progresso.sort(key=lambda t: datetime.strptime(t[3], "%d/%m/%Y %H:%M"))
+        tarefas_pendentes.sort(key=lambda t: datetime.strptime(t[3], "%d/%m/%Y %H:%M"))
 
         tarefas_ordenadas = tarefas_em_progresso + tarefas_pendentes + tarefas_vencidas + tarefas_concluidas
 
@@ -105,10 +105,10 @@ def tela_lista_tarefas(page: ft.Page, user_id: int):
         tarefas = carregar_tarefas(user_id)
 
         tarefas_pendentes_em_progresso = [
-            t for t in tarefas if t[6] not in ["Concluído"] and datetime.strptime(t[3], "%Y-%m-%d %H:%M:%S") >= datetime.now()
+            t for t in tarefas if t[6] not in ["Concluído"] and datetime.strptime(t[3], "%d/%m/%Y %H:%M") >= datetime.now()
         ]
         tarefas_vencidas = [
-            t for t in tarefas if datetime.strptime(t[3], "%Y-%m-%d %H:%M:%S") < datetime.now() and t[6] != "Concluído"
+            t for t in tarefas if datetime.strptime(t[3], "%d/%m/%Y %H:%M") < datetime.now() and t[6] != "Concluído"
         ]
         tarefas_concluidas = [t for t in tarefas if t[6] == "Concluído"]
 
@@ -117,12 +117,12 @@ def tela_lista_tarefas(page: ft.Page, user_id: int):
             tarefas_pendentes_em_progresso.sort(
                 key=lambda t: (
                     prioridade_ordem.get(t[4], 3), 
-                    datetime.strptime(t[3], "%Y-%m-%d %H:%M:%S"), 
+                    datetime.strptime(t[3], "%d/%m/%Y %H:%M"), 
                 )
             )
         elif opcao == "Prazo":
             tarefas_pendentes_em_progresso.sort(
-                key=lambda t: datetime.strptime(t[3], "%Y-%m-%d %H:%M:%S")
+                key=lambda t: datetime.strptime(t[3], "%d/%m/%Y %H:%M")
             )
 
         tarefas_ordenadas = tarefas_pendentes_em_progresso + tarefas_vencidas + tarefas_concluidas
@@ -137,7 +137,7 @@ def tela_lista_tarefas(page: ft.Page, user_id: int):
 
     def calcular_tempo_restante(prazo_str):
         try:
-            prazo = datetime.strptime(prazo_str, "%Y-%m-%d %H:%M:%S")
+            prazo = datetime.strptime(prazo_str, "%d/%m/%Y %H:%M")
             agora = datetime.now()
             delta = prazo - agora
 
@@ -179,7 +179,7 @@ def tela_lista_tarefas(page: ft.Page, user_id: int):
                 id, titulo, descricao, prazo, prioridade, categoria, status = tarefa
 
                 prazo_exibido = (
-                    "Vencida" if datetime.strptime(prazo, "%Y-%m-%d %H:%M:%S") < datetime.now() and status != "Concluído"
+                    "Vencida" if datetime.strptime(prazo, "%d/%m/%Y %H:%M") < datetime.now() and status != "Concluído"
                     else "Finalizado" if status == "Concluído"
                     else calcular_tempo_restante(prazo)
                 )
