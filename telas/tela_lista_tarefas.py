@@ -22,18 +22,18 @@ def tela_lista_tarefas(page: ft.Page, user_id: int):
         tarefas = carregar_tarefas(user_id)
 
         tarefas_em_progresso = [
-            t for t in tarefas if t[6] == "Em Progresso" and datetime.strptime(t[3], "%d/%m/%Y %H:%M") >= datetime.now()
+            t for t in tarefas if t[6] == "Em Progresso" and datetime.strptime(t[3], "%Y-%m-%d %H:%M:%S") >= datetime.now()
         ]
         tarefas_pendentes = [
-            t for t in tarefas if t[6] == "Pendente" and datetime.strptime(t[3], "%d/%m/%Y %H:%M") >= datetime.now()
+            t for t in tarefas if t[6] == "Pendente" and datetime.strptime(t[3], "%Y-%m-%d %H:%M:%S") >= datetime.now()
         ]
         tarefas_vencidas = [
-            t for t in tarefas if datetime.strptime(t[3], "%d/%m/%Y %H:%M") < datetime.now() and t[6] != "Concluído"
+            t for t in tarefas if datetime.strptime(t[3], "%Y-%m-%d %H:%M:%S") < datetime.now() and t[6] != "Concluído"
         ]
         tarefas_concluidas = [t for t in tarefas if t[6] == "Concluído"]
 
-        tarefas_em_progresso.sort(key=lambda t: datetime.strptime(t[3], "%d/%m/%Y %H:%M"))
-        tarefas_pendentes.sort(key=lambda t: datetime.strptime(t[3], "%d/%m/%Y %H:%M"))
+        tarefas_em_progresso.sort(key=lambda t: datetime.strptime(t[3], "%Y-%m-%d %H:%M:%S"))
+        tarefas_pendentes.sort(key=lambda t: datetime.strptime(t[3], "%Y-%m-%d %H:%M:%S"))
 
         tarefas_ordenadas = tarefas_em_progresso + tarefas_pendentes + tarefas_vencidas + tarefas_concluidas
 
@@ -105,10 +105,10 @@ def tela_lista_tarefas(page: ft.Page, user_id: int):
         tarefas = carregar_tarefas(user_id)
 
         tarefas_pendentes_em_progresso = [
-            t for t in tarefas if t[6] not in ["Concluído"] and datetime.strptime(t[3], "%d/%m/%Y %H:%M") >= datetime.now()
+            t for t in tarefas if t[6] not in ["Concluído"] and datetime.strptime(t[3], "%Y-%m-%d %H:%M:%S") >= datetime.now()
         ]
         tarefas_vencidas = [
-            t for t in tarefas if datetime.strptime(t[3], "%d/%m/%Y %H:%M") < datetime.now() and t[6] != "Concluído"
+            t for t in tarefas if datetime.strptime(t[3], "%Y-%m-%d %H:%M:%S") < datetime.now() and t[6] != "Concluído"
         ]
         tarefas_concluidas = [t for t in tarefas if t[6] == "Concluído"]
 
@@ -117,12 +117,12 @@ def tela_lista_tarefas(page: ft.Page, user_id: int):
             tarefas_pendentes_em_progresso.sort(
                 key=lambda t: (
                     prioridade_ordem.get(t[4], 3), 
-                    datetime.strptime(t[3], "%d/%m/%Y %H:%M"), 
+                    datetime.strptime(t[3], "%Y-%m-%d %H:%M:%S"), 
                 )
             )
         elif opcao == "Prazo":
             tarefas_pendentes_em_progresso.sort(
-                key=lambda t: datetime.strptime(t[3], "%d/%m/%Y %H:%M")
+                key=lambda t: datetime.strptime(t[3], "%Y-%m-%d %H:%M:%S")
             )
 
         tarefas_ordenadas = tarefas_pendentes_em_progresso + tarefas_vencidas + tarefas_concluidas
@@ -133,9 +133,11 @@ def tela_lista_tarefas(page: ft.Page, user_id: int):
         page.dialog = None
         page.update()
 
+
+
     def calcular_tempo_restante(prazo_str):
         try:
-            prazo = datetime.strptime(prazo_str, "%d/%m/%Y %H:%M")
+            prazo = datetime.strptime(prazo_str, "%Y-%m-%d %H:%M:%S")
             agora = datetime.now()
             delta = prazo - agora
 
@@ -177,7 +179,7 @@ def tela_lista_tarefas(page: ft.Page, user_id: int):
                 id, titulo, descricao, prazo, prioridade, categoria, status = tarefa
 
                 prazo_exibido = (
-                    "Vencida" if datetime.strptime(prazo, "%d/%m/%Y %H:%M") < datetime.now() and status != "Concluído"
+                    "Vencida" if datetime.strptime(prazo, "%Y-%m-%d %H:%M:%S") < datetime.now() and status != "Concluído"
                     else "Finalizado" if status == "Concluído"
                     else calcular_tempo_restante(prazo)
                 )
@@ -224,6 +226,9 @@ def tela_lista_tarefas(page: ft.Page, user_id: int):
                     )
                 )
         page.update()
+
+
+
 
     tabela_tarefas = ft.Column()
 
@@ -292,6 +297,7 @@ def tela_lista_tarefas(page: ft.Page, user_id: int):
                         ft.ElevatedButton("Ordenar", on_click=abrir_ordenacao, width=150, height=45),
                     ],
                     spacing=10,
+                    alignment=ft.MainAxisAlignment.CENTER,
                 ),
                 ft.Container(
                     content=tabela_tarefas,
