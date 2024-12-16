@@ -133,6 +133,8 @@ def tela_lista_tarefas(page: ft.Page, user_id: int):
         page.dialog = None
         page.update()
 
+
+
     def calcular_tempo_restante(prazo_str):
         try:
             prazo = datetime.strptime(prazo_str, "%d/%m/%Y %H:%M")
@@ -225,6 +227,9 @@ def tela_lista_tarefas(page: ft.Page, user_id: int):
                 )
         page.update()
 
+
+
+
     tabela_tarefas = ft.Column()
 
     categoria_dropdown = ft.Dropdown(
@@ -292,6 +297,7 @@ def tela_lista_tarefas(page: ft.Page, user_id: int):
                         ft.ElevatedButton("Ordenar", on_click=abrir_ordenacao, width=150, height=45),
                     ],
                     spacing=10,
+                    alignment=ft.MainAxisAlignment.CENTER,
                 ),
                 ft.Container(
                     content=tabela_tarefas,

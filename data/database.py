@@ -1,6 +1,7 @@
 import sqlite3
 import bcrypt
 import re
+from datetime import datetime
 
 def inicializar_banco_tarefas():
     conexao = sqlite3.connect("tarefas.db")
@@ -67,14 +68,16 @@ def validar_email(email):
     return re.match(padrao, email)
 
 def adicionar_tarefa(usuario_id, titulo, descricao, prazo, prioridade, categoria):
+    prazo_formatado = datetime.strptime(prazo, "%d/%m/%Y %H:%M").strftime("%d/%m/%Y %H:%M")
     conexao = sqlite3.connect("tarefas.db")
     cursor = conexao.cursor()
     cursor.execute("""
         INSERT INTO tarefas (usuario_id, titulo, descricao, prazo, prioridade, categoria, status)
-        VALUES (?, ?, ?, ?, ?, ?, 'Pendente')  -- O status padrão é 'Pendente'
-    """, (usuario_id, titulo, descricao, prazo, prioridade, categoria))
+        VALUES (?, ?, ?, ?, ?, ?, 'Pendente')
+    """, (usuario_id, titulo, descricao, prazo_formatado, prioridade, categoria))
     conexao.commit()
     conexao.close()
+
 
 def carregar_tarefas(usuario_id):
     conexao = sqlite3.connect("tarefas.db")
@@ -113,6 +116,9 @@ def atualizar_status_tarefa(tarefa_id, status):
     finally:
         conexao.close()
 
+
+
+
 def excluir_tarefa(tarefa_id):
     conexao = sqlite3.connect("tarefas.db")
     cursor = conexao.cursor()
@@ -121,12 +127,13 @@ def excluir_tarefa(tarefa_id):
     conexao.close()
 
 def atualizar_tarefa(tarefa_id, titulo, descricao, prazo, prioridade, categoria):
+    prazo_formatado = datetime.strptime(prazo, "%d/%m/%Y %H:%M").strftime("%d/%m/%Y %H:%M")
     conexao = sqlite3.connect("tarefas.db")
     cursor = conexao.cursor()
     cursor.execute("""
         UPDATE tarefas
         SET titulo = ?, descricao = ?, prazo = ?, prioridade = ?, categoria = ?
         WHERE id = ?
-    """, (titulo, descricao, prazo, prioridade, categoria, tarefa_id))
+    """, (titulo, descricao, prazo_formatado, prioridade, categoria, tarefa_id))
     conexao.commit()
     conexao.close()

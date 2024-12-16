@@ -130,7 +130,7 @@ def tela_cadastrar_tarefa(page: ft.Page, user_id: int):
     ano_dropdown = ft.Dropdown(hint_text="Ano", options=[ft.dropdown.Option(a) for a in anos], width=70)
 
     hora_dropdown = ft.Dropdown(hint_text="Hora", options=[ft.dropdown.Option(h) for h in horas], width=70)
-    minuto_dropdown = ft.Dropdown(hint_text="Minuto", options=[ft.dropdown.Option(m) for m in minutos], width=70)
+    minuto_dropdown = ft.Dropdown(hint_text="Minuto", options=[ft.dropdown.Option(m) for m in minutos], width=80)
 
     data_dialog = ft.AlertDialog(
         title=ft.Text("Selecionar Data", size=16, weight=ft.FontWeight.BOLD),
@@ -176,6 +176,7 @@ def tela_cadastrar_tarefa(page: ft.Page, user_id: int):
                 ft.Row(
                     [vencimento_data_button, vencimento_horario_button],
                     spacing=10,
+                    alignment=ft.MainAxisAlignment.CENTER,
                 ),
                 prioridade_dropdown,
                 categoria_dropdown,

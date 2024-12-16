@@ -50,7 +50,7 @@ def main(page: ft.Page, user_id: int):
 
     header = ft.Row(
         [
-            ft.Image(src=r"C:\Users\wands\OneDrive\Documentos\taskzen\logo\icon.png", width=50, height=50, fit=ft.ImageFit.CONTAIN),
+            ft.Image(src="logo/icon.png", width=50, height=50, fit=ft.ImageFit.CONTAIN),
             ft.Text("TaskZen", size=24, weight=ft.FontWeight.BOLD, color="black"),
         ],
         alignment=ft.MainAxisAlignment.CENTER,
